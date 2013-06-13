@@ -1,17 +1,41 @@
-<!DOCTYPE HTML>
-<html>
+<!DOCTYPE html>
+<html lang="ja">
+  <meta charset="utf-8">
   <head>
-    <style>
-    body {
-      margin: 0px;
-      padding: 0px;
-    }
-    </style>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-    <script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v4.5.3.min.js"></script>
-    <script src="main.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+    //これはテストです。gingbear
+    //reconnect:falseは、切断した時に再接続しないため。
+    //これを入れないと、サーバが落ちた時にエラーでる。
+    var socket = io.connect('http://'+location.hostname, {
+      'reconnect': false
+    });
+
+    //socket.send()で送信されたメッセージは'message'のハンドラで取得できる。
+    socket.on('message', function (data) {
+      $("#message-area").append(data+"<br>");
+    });
+
+    //切断されたときのハンドラ
+    socket.on('disconnect', function(message){
+      $("#message-area").append('切断されました');
+    });
+
+    //buttonを押したときの関数
+    function sendMessage() {
+      var msg = $("#message-text").val();
+      socket.send(msg);
+    };
+    </script>
   </head>
   <body>
-    <div id="container"></div>
+    <h1>test app</h1>
+    <input id="message-text" type="text">
+    <button id="message-send" onclick="sendMessage();">send</button>
+    <div id="message-area"></div>
   </body>
 </html>
+
+
