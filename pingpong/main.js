@@ -73,23 +73,26 @@ function init(){
         var msg = {cursolX: absPosX};
 
         // サーバにXの位置を送信
-        socket.send(msg);
+        socket.emit('pos', msg);
     });
 
     //socket.send()で送信されたメッセージは'message'のハンドラで取得できる。
-    socket.on('message', function (data) {
+    socket.on('update', function (data) {
         // ball
-        var absBallPosX = data.getBallX;
-        var absBallPosY = data.getBallY;
+        var absBallPosX = data.ballX;
+        console.log("data:"+data);
+        var absBallPosY = data.ballY;
         var ballX = absBallPosX * field.getWidth() - ball.getRadius()/2;
         var ballY = absBallPosY * field.getHeight() - ball.getRadius()/2;
         ball.setPosition(ballX, ballY);
 
         // other position
-        var absOtherPosX = data.getOtherX;
+        var absOtherPosX = data.otherX;
+        console.log("OtherPosX:"+absOtherPosX);
         var otherX = absOtherPosX * field.getWidth() - otherRect.getWidth()/2;
+        console.log("OtherX:"+otherX);
         otherRect.setPosition(otherX, otherRect.getPosition.y);
-        
+        console.log(otherRect.getPosition().x);
         layer.draw();
     });
 
