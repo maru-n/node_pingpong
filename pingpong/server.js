@@ -38,13 +38,13 @@ io.sockets.on('connection', function (socket) {
                 otherX:players[socket.num==0?1:0]
             };
             console.log(socket.num+':'+players[socket.num]);
-        socket.send({ballX:Math.cos(theta),ballY:Math.sin(theta)});
+        socket.emit('update',data);
     }, 100);
 
 
-    socket.on('message', function (data) {
+    socket.on('pos', function (data) {
         // console.log(data);
-        players[socket.num]=socket.num;
+        players[socket.num]=data.cursolX;
         // var msg = "[" + socket.id + "] >> " + data;
         // socket.send(msg);
         // socket.broadcast.send(msg);
