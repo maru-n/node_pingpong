@@ -1,16 +1,16 @@
-    //これはテストです。gingbear
-    //reconnect:falseは、切断した時に再接続しないため。
-    //これを入れないと、サーバが落ちた時にエラーでる。
-    var socket = io.connect('http://'+location.hostname, {
-      'reconnect': false
-    });
+//これはテストです。gingbear
+//reconnect:falseは、切断した時に再接続しないため。
+//これを入れないと、サーバが落ちた時にエラーでる。
+var socket = io.connect('http://'+location.hostname, {
+    'reconnect': false
+});
 
 
 function init(){
-
+    
     const STAGE_WIDTH = 640;
     const STAGE_HEIGHT = 480;
-
+    
     var stage = new Kinetic.Stage({
         container: 'container',
         width: window.innerWidth,
