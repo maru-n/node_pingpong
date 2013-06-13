@@ -6,7 +6,6 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
 
-    //これはテストです。gingbear
     //reconnect:falseは、切断した時に再接続しないため。
     //これを入れないと、サーバが落ちた時にエラーでる。
     var socket = io.connect('http://'+location.hostname, {
