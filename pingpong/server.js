@@ -15,23 +15,34 @@ function handler (req, res) {
     });
 };
 
+
 io.sockets.num=0;
 io.sockets.on('connection', function (socket) {
+    socket.num=io.sockets.num;
     if(++io.sockets.num>2)
         //TODO:複数プレイは後で対応
         return;
 
+    var players=[0,0];
     var t=1;
     setInterval(function() {
-        var theta=++t/180*Math.PI; 
-        console.log(theta);
+        var theta=++t/180*Math.PI,
+            data={
+                ballX:Math.cos(theta),
+                ballY:Math.sin(theta),
+                myX:players[socket.num],
+                otherX:players[socket.num==0?1:0]
+            };
+            console.log(socket.num+':'+players[socket.num]);
         socket.send({ballX:Math.cos(theta),ballY:Math.sin(theta)});
     }, 100);
 
 
     socket.on('message', function (data) {
-        var msg = "[" + socket.id + "] >> " + data;
-        socket.send(msg);
-        socket.broadcast.send(msg);
+        // console.log(data);
+        players[socket.num]=socket.num;
+        // var msg = "[" + socket.id + "] >> " + data;
+        // socket.send(msg);
+        // socket.broadcast.send(msg);
     });
 });
