@@ -4,37 +4,11 @@
   <head>
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-
-    //これはテストです。gingbear
-    //reconnect:falseは、切断した時に再接続しないため。
-    //これを入れないと、サーバが落ちた時にエラーでる。
-    var socket = io.connect('http://'+location.hostname, {
-      'reconnect': false
-    });
-
-    //socket.send()で送信されたメッセージは'message'のハンドラで取得できる。
-    socket.on('message', function (data) {
-      $("#message-area").append(data+"<br>");
-    });
-
-    //切断されたときのハンドラ
-    socket.on('disconnect', function(message){
-      $("#message-area").append('切断されました');
-    });
-
-    //buttonを押したときの関数
-    function sendMessage() {
-      var msg = $("#message-text").val();
-      socket.send(msg);
-    };
-    </script>
+    <script src="main.js"></script>
+  
   </head>
   <body>
-    <h1>test app</h1>
-    <input id="message-text" type="text">
-    <button id="message-send" onclick="sendMessage();">send</button>
-    <div id="message-area"></div>
+    <div id="container"></div>
   </body>
 </html>
 
