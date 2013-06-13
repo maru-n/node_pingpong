@@ -5,7 +5,6 @@ var socket = io.connect('http://'+location.hostname, {
     'reconnect': false
 });
 
-
 function init(){
     
     const STAGE_WIDTH = 640;
@@ -28,7 +27,7 @@ function init(){
     });
     layer.add(field);
     
-    var rect = new Kinetic.Rect({
+    var myRect = new Kinetic.Rect({
         x: 300,
         y: 400,
         width: 100,
@@ -37,7 +36,18 @@ function init(){
         stroke: 'black',
         strokeWidth: 2
     });
-    layer.add(rect);
+    layer.add(myRect);
+
+    var otherRect =  new Kinetic.Rect({
+        x: 300,
+        y: 100,
+        width: 100,
+        height: 50,
+        fill: 'red',
+        stroke: 'black',
+        strokeWidth: 2
+    });
+    layer.add(otherRect);
 
     var ball = new Kinetic.Circle({
         x: stage.getWidth() / 2,
@@ -55,8 +65,8 @@ function init(){
     
     stage.on('mousemove', function() {
         var mousePos = stage.getMousePosition();
-        var x = mousePos.x - rect.getWidth()/2;
-        rect.setPosition(x, rect.getPosition().y);
+        var x = mousePos.x - myRect.getWidth()/2;
+        myRect.setPosition(x, myRect.getPosition().y);
         layer.draw();
 
         var absPosX = x / field.getWidth();
@@ -68,11 +78,18 @@ function init(){
 
     //socket.send()で送信されたメッセージは'message'のハンドラで取得できる。
     socket.on('message', function (data) {
-        var absPosX = data.getBallX;
-        var absPosY = data.getBallY;
-        var x = absPosX * field.getWidth() - ball.getRadius()/2;
-        var y = absPosY * field.getHeight() - ball.getRadius()/2;
-        ball.setPosition(x, y);
+        // ball
+        var absBallPosX = data.getBallX;
+        var absBallPosY = data.getBallY;
+        var ballX = absBallPosX * field.getWidth() - ball.getRadius()/2;
+        var ballY = absBallPosY * field.getHeight() - ball.getRadius()/2;
+        ball.setPosition(ballX, ballY);
+
+        // other position
+        var absOtherPosX = data.getOtherX;
+        var otherX = absOtherPosX * field.getWidth() - otherRect.getWidth()/2;
+        otherRect.setPosition(otherX, otherRect.getPosition.y);
+        
         layer.draw();
     });
 
