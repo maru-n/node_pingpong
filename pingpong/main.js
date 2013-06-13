@@ -39,6 +39,18 @@ function init(){
     });
     layer.add(rect);
 
+    var ball = new Kinetic.Circle({
+        x: stage.getWidth() / 2,
+        y: stage.getHeight() / 2,
+        radius: 10,
+        fill: 'red',
+        stroke: 'black',
+        strokeWidth: 2
+      });
+
+    // add the shape to the layer
+    layer.add(ball);
+
     stage.add(layer);
     
     stage.on('mousemove', function() {
@@ -58,9 +70,9 @@ function init(){
     socket.on('message', function (data) {
         var absPosX = data.getBallX;
         var absPosY = data.getBallY;
-        var x = absPosX * field.getWidth() - rect.getWidth()/2;
-        // var y = absPosY * field.getHeight() - rect.getHeight()/2;
-        rect.setPosition(x, rect.getPosition().y);
+        var x = absPosX * field.getWidth() - ball.getRadius()/2;
+        var y = absPosY * field.getHeight() - ball.getRadius()/2;
+        ball.setPosition(x, y);
         layer.draw();
     });
 
