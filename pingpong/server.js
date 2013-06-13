@@ -5,7 +5,11 @@ var app = require('http').createServer(handler),
 app.listen(3001);
 
 function handler (req, res) {
-    fs.readFile(__dirname + '/index.html',function (err, data) {
+    var path = req.url;
+    if(path === "/") {
+        path += "index.html";
+    }
+    fs.readFile(__dirname + path,function (err, data) {
         if (err) {
             res.writeHead(500);
             return res.end('Error loading index.html');
@@ -35,3 +39,4 @@ io.sockets.on('connection', function (socket) {
         socket.broadcast.send(msg);
     });
 });
+
