@@ -130,7 +130,7 @@ function init(){
     //     socket.emit('pos', msg);
     //     return;
     // }
-});
+}
 
 $(document).ready(function(){
     init();
