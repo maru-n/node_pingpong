@@ -63,18 +63,18 @@ function init(){
 
     stage.add(layer);
     
-    stage.on('mousemove', function() {
-        var mousePos = stage.getMousePosition();
-        var x = mousePos.x - myRect.getWidth()/2;
-        myRect.setPosition(x, myRect.getPosition().y);
-        layer.draw();
+    // stage.on('mousemove', function() {
+    //     var mousePos = stage.getMousePosition();
+    //     var x = mousePos.x - myRect.getWidth()/2;
+    //     myRect.setPosition(x, myRect.getPosition().y);
+    //     layer.draw();
 
-        var absPosX = x / field.getWidth();
-        var msg = {cursolX: absPosX};
+    //     var absPosX = x / field.getWidth();
+    //     var msg = {cursolX: absPosX};
 
-        // サーバにXの位置を送信
-        socket.emit('pos', msg);
-    });
+    //     // サーバにXの位置を送信
+    //     socket.emit('pos', msg);
+    // });
 
     //socket.send()で送信されたメッセージは'message'のハンドラで取得できる。
     socket.on('update', function (data) {
@@ -101,35 +101,36 @@ function init(){
     });
 
     // キーボード操作
-    // $(window).keydown(function(e) {
-    // if (e.keyCode == 37) {
-    //     // left
-    //     var crrX = myRect.getPosition().x;
-    //     var dx = 5
-    //     myRect.setPosition(crrX+dx, myRect.getPosition().y);
-    //     layer.draw();
+    $(window).keydown(function(e) {
+        if (e.keyCode == 37) {
+            // left
+            var crrX = myRect.getPosition().x;
+            var dx = -10
+            myRect.setPosition(crrX+dx, myRect.getPosition().y);
+            layer.draw();
 
-    //     var absPosX = x / field.getWidth();
-    //     var msg = {cursolX: absPosX};
+            var absPosX = dx / field.getWidth();
+            var msg = {cursolX: absPosX};
 
-    //     // サーバにXの位置を送信
-    //     socket.emit('pos', msg);
-    //     return;
-    // }
-    // if (e.keyCode == 39) {
-    //     // right
-    //     var crrX = myRect.getPosition().x;
-    //     var dx = -5
-    //     myRect.setPosition(crrX+dx, myRect.getPosition().y);
-    //     layer.draw();
+            // サーバにXの位置を送信
+            socket.emit('pos', msg);
+            return;
+        }
+        if (e.keyCode == 39) {
+            // right
+            var crrX = myRect.getPosition().x;
+            var dx = 10
+            myRect.setPosition(crrX+dx, myRect.getPosition().y);
+            layer.draw();
 
-    //     var absPosX = x / field.getWidth();
-    //     var msg = {cursolX: absPosX};
+            var absPosX = dx / field.getWidth();
+            var msg = {cursolX: absPosX};
 
-    //     // サーバにXの位置を送信
-    //     socket.emit('pos', msg);
-    //     return;
-    // }
+            // サーバにXの位置を送信
+            socket.emit('pos', msg);
+            return;
+        }
+    });
 }
 
 $(document).ready(function(){
