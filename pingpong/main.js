@@ -131,7 +131,6 @@ function init(){
     //     return;
     // }
 });
-}
 
 $(document).ready(function(){
     init();
