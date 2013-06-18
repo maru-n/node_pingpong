@@ -8,7 +8,7 @@ var socket = io.connect('http://'+location.hostname, {
 function init(){
     
     const STAGE_WIDTH = 640;
-    const STAGE_HEIGHT = 480;
+    const STAGE_HEIGHT = 640;
     
     var stage = new Kinetic.Stage({
         container: 'container',
@@ -80,19 +80,18 @@ function init(){
     socket.on('update', function (data) {
         // ball
         var absBallPosX = data.ballX;
-        console.log("data:"+data);
         var absBallPosY = data.ballY;
         var ballX = absBallPosX * field.getWidth() - ball.getRadius()/2;
         var ballY = absBallPosY * field.getHeight() - ball.getRadius()/2;
+        // console.log("ballX:"+ballX+"ballY"+ballY);
         ball.setPosition(ballX, ballY);
 
         // other position
         var absOtherPosX = data.otherX;
-        console.log("OtherPosX:"+absOtherPosX);
         var otherX = absOtherPosX * field.getWidth() - otherRect.getWidth()/2;
-        console.log("OtherX:"+otherX);
-        otherRect.setPosition(otherX, otherRect.getPosition.y);
-        console.log(otherRect.getPosition().x);
+        // console.log("absOtherPosX:"+absOtherPosX+" otherX:"+otherX);
+        otherRect.setPosition(otherX, otherRect.getPosition().y);
+        // console.log("OtherX:"+otherRect.getPosition().x+"OtherY:"+otherRect.getPosition().x);
         layer.draw();
     });
 
@@ -100,8 +99,42 @@ function init(){
     socket.on('disconnect', function(message){
       $("#message-area").append('切断されました');
     });
+
+    // キーボード操作
+    // $(window).keydown(function(e) {
+    // if (e.keyCode == 37) {
+    //     // left
+    //     var crrX = myRect.getPosition().x;
+    //     var dx = 5
+    //     myRect.setPosition(crrX+dx, myRect.getPosition().y);
+    //     layer.draw();
+
+    //     var absPosX = x / field.getWidth();
+    //     var msg = {cursolX: absPosX};
+
+    //     // サーバにXの位置を送信
+    //     socket.emit('pos', msg);
+    //     return;
+    // }
+    // if (e.keyCode == 39) {
+    //     // right
+    //     var crrX = myRect.getPosition().x;
+    //     var dx = -5
+    //     myRect.setPosition(crrX+dx, myRect.getPosition().y);
+    //     layer.draw();
+
+    //     var absPosX = x / field.getWidth();
+    //     var msg = {cursolX: absPosX};
+
+    //     // サーバにXの位置を送信
+    //     socket.emit('pos', msg);
+    //     return;
+    // }
+});
 }
 
 $(document).ready(function(){
     init();
 });
+
+
