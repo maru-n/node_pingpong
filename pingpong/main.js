@@ -8,7 +8,7 @@ function init(){
     const STAGE_HEIGHT = 640;
 
     const CURSOL_WIDTH = 100;
-    const CURSOL_HEIGHT = 50;
+    const CURSOL_HEIGHT = 30;
     
     var stage = new Kinetic.Stage({
         container: 'container',
@@ -27,27 +27,27 @@ function init(){
     });
     layer.add(field);
     
-    var cursol = new Kinetic.Rect({
+    var myCursol = new Kinetic.Rect({
         x: 300,
-        y: 400,
+        y: field.getHeight() - CURSOL_HEIGHT - 50,
         width: CURSOL_WIDTH,
         height: CURSOL_HEIGHT,
         fill: 'green',
         stroke: 'black',
         strokeWidth: 2
     });
-    layer.add(cursol);
+    layer.add(myCursol);
 
-    var otherRect =  new Kinetic.Rect({
+    var otherCursol =  new Kinetic.Rect({
         x: 300,
-        y: 100,
-        width: 100,
-        height: 50,
+        y: 50,
+        width: CURSOL_WIDTH,
+        height: CURSOL_HEIGHT,
         fill: 'red',
         stroke: 'black',
         strokeWidth: 2
     });
-    layer.add(otherRect);
+    layer.add(otherCursol);
 
     var ball = new Kinetic.Circle({
         x: stage.getWidth() / 2,
@@ -89,14 +89,14 @@ function init(){
     $(window).keydown(function(e) {
         var dx = 1;        
         var moveFunc = function(dx) {
-            var pos = cursol.getPosition();
+            var pos = myCursol.getPosition();
             var newX = pos.x + dx;
             if( newX < 0 ) {
                 newX = 0;
-            }else if( newX > field.getWidth() - cursol.getWidth() ) {
-                newX = field.getWidth() - cursol.getWidth();
+            }else if( newX > field.getWidth() - myCursol.getWidth() ) {
+                newX = field.getWidth() - myCursol.getWidth();
             }
-            cursol.setPosition(newX, pos.y);
+            myCursol.setPosition(newX, pos.y);
             layer.draw();
 
             // サーバにXの位置を送信

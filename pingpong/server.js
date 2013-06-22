@@ -9,7 +9,7 @@ function handler (req, res) {
     if(path === "/") {
         path += "index.html";
     }
-    fs.readFile(__dirname + path,function (err, data) {
+     fs.readFile(__dirname + path,function (err, data) {
         if (err) {
             res.writeHead(500);
             return res.end('Error loading index.html');
