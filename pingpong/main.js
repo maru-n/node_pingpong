@@ -1,6 +1,3 @@
-//これはテストです。gingbear
-//reconnect:falseは、切断した時に再接続しないため。
-//これを入れないと、サーバが落ちた時にエラーでる。
 var socket = io.connect('http://'+location.hostname, {
     'reconnect': false
 });
@@ -9,6 +6,9 @@ function init(){
     
     const STAGE_WIDTH = 640;
     const STAGE_HEIGHT = 640;
+
+    const CURSOL_WIDTH = 100;
+    const CURSOL_HEIGHT = 50;
     
     var stage = new Kinetic.Stage({
         container: 'container',
@@ -27,16 +27,16 @@ function init(){
     });
     layer.add(field);
     
-    var myRect = new Kinetic.Rect({
+    var cursol = new Kinetic.Rect({
         x: 300,
         y: 400,
-        width: 100,
-        height: 50,
+        width: CURSOL_WIDTH,
+        height: CURSOL_HEIGHT,
         fill: 'green',
         stroke: 'black',
         strokeWidth: 2
     });
-    layer.add(myRect);
+    layer.add(cursol);
 
     var otherRect =  new Kinetic.Rect({
         x: 300,
@@ -60,22 +60,8 @@ function init(){
 
     // add the shape to the layer
     layer.add(ball);
-
     stage.add(layer);
     
-    // stage.on('mousemove', function() {
-    //     var mousePos = stage.getMousePosition();
-    //     var x = mousePos.x - myRect.getWidth()/2;
-    //     myRect.setPosition(x, myRect.getPosition().y);
-    //     layer.draw();
-
-    //     var absPosX = x / field.getWidth();
-    //     var msg = {cursolX: absPosX};
-
-    //     // サーバにXの位置を送信
-    //     socket.emit('pos', msg);
-    // });
-
     //socket.send()で送信されたメッセージは'message'のハンドラで取得できる。
     socket.on('update', function (data) {
         // ball
@@ -83,15 +69,12 @@ function init(){
         var absBallPosY = data.ballY;
         var ballX = absBallPosX * field.getWidth() - ball.getRadius()/2;
         var ballY = absBallPosY * field.getHeight() - ball.getRadius()/2;
-        // console.log("ballX:"+ballX+"ballY"+ballY);
         ball.setPosition(ballX, ballY);
 
         // other position
         var absOtherPosX = data.otherX;
         var otherX = absOtherPosX * field.getWidth() - otherRect.getWidth()/2;
-        // console.log("absOtherPosX:"+absOtherPosX+" otherX:"+otherX);
         otherRect.setPosition(otherX, otherRect.getPosition().y);
-        // console.log("OtherX:"+otherRect.getPosition().x+"OtherY:"+otherRect.getPosition().x);
         layer.draw();
     });
 
@@ -101,34 +84,53 @@ function init(){
     });
 
     // キーボード操作
+    var rightKeyPressed = false;
+    var leftKeyPressed = false;
     $(window).keydown(function(e) {
+        var dx = 1;        
+        var moveFunc = function(dx) {
+            var pos = cursol.getPosition();
+            var newX = pos.x + dx;
+            if( newX < 0 ) {
+                newX = 0;
+            }else if( newX > field.getWidth() - cursol.getWidth() ) {
+                newX = field.getWidth() - cursol.getWidth();
+            }
+            cursol.setPosition(newX, pos.y);
+            layer.draw();
+
+            // サーバにXの位置を送信
+            var absPosX = dx / field.getWidth();
+            var msg = {cursolX: absPosX};
+            socket.emit('pos', msg);
+        };
+        
         if (e.keyCode == 37) {
             // left
-            var crrX = myRect.getPosition().x;
-            var dx = -10
-            myRect.setPosition(crrX+dx, myRect.getPosition().y);
-            layer.draw();
-
-            var absPosX = dx / field.getWidth();
-            var msg = {cursolX: absPosX};
-
-            // サーバにXの位置を送信
-            socket.emit('pos', msg);
-            return;
+            leftKeyPressed = true;
+            setTimeout( function(){
+                moveFunc(-dx);
+                if( leftKeyPressed ) {
+                    setTimeout(arguments.callee, 0);
+                }
+            }, 0);
+        }else if (e.keyCode == 39) {
+            //right
+            rightKeyPressed = true;
+            setTimeout(function(){
+                moveFunc(dx);
+                if( rightKeyPressed ) {
+                    setTimeout(arguments.callee, 0);
+                }
+            }, 0);
         }
-        if (e.keyCode == 39) {
-            // right
-            var crrX = myRect.getPosition().x;
-            var dx = 10
-            myRect.setPosition(crrX+dx, myRect.getPosition().y);
-            layer.draw();
-
-            var absPosX = dx / field.getWidth();
-            var msg = {cursolX: absPosX};
-
-            // サーバにXの位置を送信
-            socket.emit('pos', msg);
-            return;
+        return;
+    });
+    $(window).keyup(function(e) {
+        if (e.keyCode == 37) {
+            leftKeyPressed = false;
+        }else if (e.keyCode == 39) {
+            rightKeyPressed = false;
         }
     });
 }
@@ -136,5 +138,6 @@ function init(){
 $(document).ready(function(){
     init();
 });
+
 
 
