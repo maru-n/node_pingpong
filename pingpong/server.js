@@ -2,7 +2,7 @@ var app = require('http').createServer(handler),
     io = require('socket.io').listen(app),
     fs = require('fs');
 
-app.listen(3001);
+app.listen(3000);
 
 function handler (req, res) {
     var path = req.url;
@@ -45,5 +45,6 @@ io.sockets.on('connection', function (socket) {
         io.sockets.players[socket.num]=data.cursolX;
     });
 });
+
 
 
