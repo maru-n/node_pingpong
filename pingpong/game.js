@@ -6,7 +6,12 @@ exports.getNewGame = function() {
 
 var Game = function() {
     this.players = new Array();
-    this.playTime = 0;
+    this.ball = {
+        x:0.5,
+        y:0.5,
+        vx:0,
+        vy:0
+    };
 };
 Game.prototype = {
     addPlayer : function(socket, name) {
@@ -20,7 +25,6 @@ Game.prototype = {
 
         p.setSocket(socket);
         p.setName(name);
-        p.x = 0.7;
         this.players.push(p);
 
         if( this.players.length == 2 ) {
@@ -31,6 +35,10 @@ Game.prototype = {
     },
     
     start: function() {
+        var iv = 0.01;
+        var t = Math.random() * Math.PI * 2.0;
+        this.ball.vx = iv * Math.cos(t);
+        this.ball.vy = iv * Math.sin(t);
         var self = this;
         setInterval(function(){
             self.update();
@@ -38,22 +46,36 @@ Game.prototype = {
     },
 
     update: function() {
-        var theta = (this.playTime+=20)/180*Math.PI,
-            r = 0.3;
         var play0_data={
-            ballX:r*Math.cos(theta)+0.5,
-            ballY:r*Math.sin(theta)+0.5,
+            ballX:this.ball.x,
+            ballY:this.ball.y,
             myX:this.players[0].x,
             otherX:this.players[1].x
         };
         this.players[0].socket.emit('update', play0_data);
         var play1_data={
-            ballX:r*Math.cos(theta)+0.5,
-            ballY:r*Math.sin(theta)+0.5,
+            ballX:this.ball.x,
+            ballY:this.ball.y,
             myX:this.players[1].x,
             otherX:this.players[0].x
         };
         this.players[1].socket.emit('update', play1_data);
+        this.ball.x += this.ball.vx;
+        this.ball.y += this.ball.vy;
+        if(this.ball.x < 0) {
+            this.ball.x = 0;
+            this.ball.vx *= -1;
+        }else if(this.ball.x > 1.0) {
+            this.ball.x = 1.0;
+            this.ball.vx *= -1;
+        }
+        if(this.ball.y < 0) {
+            this.ball.y = 0;
+            this.ball.vy *= -1;
+        }else if(this.ball.y > 1.0) {
+            this.ball.y = 1.0;
+            this.ball.vy *= -1;
+        }
     },
 
     getPlayerNum : function() {
@@ -84,3 +106,4 @@ function test() {
 
 
 //test();
+
