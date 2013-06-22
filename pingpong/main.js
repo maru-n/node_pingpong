@@ -73,7 +73,7 @@ function init(){
 
         // other position
         var absOtherPosX = data.otherX;
-        var otherX = (1.0 - absOtherPosX) * field.getWidth() - otherCursol.getWidth()/2;
+        var otherX = absOtherPosX * field.getWidth() - otherCursol.getWidth()/2;
         otherCursol.setPosition(otherX, otherCursol.getPosition().y);
         layer.draw();
     });
@@ -138,6 +138,7 @@ function init(){
 $(document).ready(function(){
     init();
 });
+
 
 
 

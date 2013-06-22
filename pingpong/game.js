@@ -15,13 +15,18 @@ var Game = function() {
 };
 Game.prototype = {
     addPlayer : function(socket, name) {
-        if(this.getPlayerNum() >= 2) {
+        var p = new Player();
+        if(this.getPlayerNum() == 0) {
+            socket.on('pos', function (data) {
+                p.x = data.cursolX;
+            });
+        }else if(this.getPlayerNum() == 1) {
+            socket.on('pos', function (data) {
+                p.x = 1.0 - data.cursolX;
+            });
+        }else{
             return false;
         }
-        var p = new Player();
-        socket.on('pos', function (data) {
-            p.x = data.cursolX;
-        });
 
         p.setSocket(socket);
         p.setName(name);
@@ -56,8 +61,8 @@ Game.prototype = {
         var play1_data={
             ballX:this.ball.x,
             ballY:this.ball.y,
-            myX:this.players[1].x,
-            otherX:this.players[0].x
+            myX:1.0-this.players[1].x,
+            otherX:1.0-this.players[0].x
         };
         this.players[1].socket.emit('update', play1_data);
         this.ball.x += this.ball.vx;
