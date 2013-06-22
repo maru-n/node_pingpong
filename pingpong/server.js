@@ -19,35 +19,30 @@ function handler (req, res) {
     });
 };
 
-
 io.sockets.num=0;
+io.sockets.players=[0,0];
 io.sockets.on('connection', function (socket) {
     socket.num=io.sockets.num;
     if(++io.sockets.num>2)
         //TODO:複数プレイは後で対応
         return;
 
-    var players=[0,0];
     var t=1;
     setInterval(function() {
-        var theta=++t/180*Math.PI,
-            data={
-                ballX:Math.cos(theta),
-                ballY:Math.sin(theta),
-                myX:players[socket.num],
-                otherX:players[socket.num==0?1:0]
+        var theta=(t+=20)/180*Math.PI,
+            r=0.3;
+            play_data={
+                ballX:r*Math.cos(theta)+0.5,
+                ballY:r*Math.sin(theta)+0.5,
+                myX:io.sockets.players[socket.num],
+                otherX:io.sockets.players[socket.num==0?1:0]
             };
-            console.log(socket.num+':'+players[socket.num]);
-        socket.emit('update',data);
-    }, 100);
+        socket.emit('update',play_data);
+    }, 30);
 
 
     socket.on('pos', function (data) {
-        // console.log(data);
-        players[socket.num]=data.cursolX;
-        // var msg = "[" + socket.id + "] >> " + data;
-        // socket.send(msg);
-        // socket.broadcast.send(msg);
+        io.sockets.players[socket.num]=data.cursolX;
     });
 });
 
