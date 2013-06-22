@@ -73,8 +73,8 @@ function init(){
 
         // other position
         var absOtherPosX = data.otherX;
-        var otherX = absOtherPosX * field.getWidth() - otherRect.getWidth()/2;
-        otherRect.setPosition(otherX, otherRect.getPosition().y);
+        var otherX = (1.0 - absOtherPosX) * field.getWidth() - otherCursol.getWidth()/2;
+        otherCursol.setPosition(otherX, otherCursol.getPosition().y);
         layer.draw();
     });
 
@@ -100,7 +100,7 @@ function init(){
             layer.draw();
 
             // サーバにXの位置を送信
-            var absPosX = dx / field.getWidth();
+            var absPosX = (newX + myCursol.getWidth()/2) / field.getWidth();
             var msg = {cursolX: absPosX};
             socket.emit('pos', msg);
         };
