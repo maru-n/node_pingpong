@@ -41,6 +41,7 @@ Game.prototype = {
     startGame: function() {
         var data ={};
         this.sendData2AllPlayers('start_game', data);
+        this.playGame();
     },
 
     endGame: function() {
@@ -48,17 +49,20 @@ Game.prototype = {
         this.sendData2AllPlayers('end_game', data);
     },
 
-    play: function() {
+    playGame: function() {
+        var data = {};
+        this.sendData2AllPlayers('play', data);
         var self = this;
         this.updateTimer = setInterval(function(){
             self.update();
         }, 30);
     },
 
-    pause: function() {
+    pauseGame: function() {
         clearInterval(this.updateTimer);
         var data = {};
         this.sendData2AllPlayers('pause', data);
+        //TODO:
         //ゲーム終了？
         if( false ) {
             this.endGame();
@@ -68,6 +72,7 @@ Game.prototype = {
     },
 
     update: function() {
+        //TODO:
         //update logic of games
         var data ={};
         this.sendData2AllPlayers('update', data);
@@ -116,5 +121,6 @@ function test() {
 
 
 //test();
+
 
 
