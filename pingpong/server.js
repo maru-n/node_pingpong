@@ -25,10 +25,11 @@ var waitingGame = null;
 io.sockets.on('connection', function (socket) {
     if( !waitingGame ) {
         var newGame = require('game').getNewGame();
-        newGame.addPlayer(socket, "player0");
         waitingGame = newGame;
-    }else{
-        waitingGame.addPlayer(socket, "player1");
+    }
+    waitingGame.addPlayer(socket, "player0");
+    if(!waitingGame.isWaitingGame()){
         waitingGame = null;
     }
 });
+

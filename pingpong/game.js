@@ -4,6 +4,9 @@ exports.getNewGame = function() {
     return game;
 };
 
+
+var MaxPlayers = 4;
+
 var Game = function() {
     this.players = new Array();
     this.ball = {
@@ -13,94 +16,84 @@ var Game = function() {
         vy:0
     };
 };
+
 Game.prototype = {
     addPlayer : function(socket, name) {
         var p = new Player();
-        if(this.getPlayerNum() == 0) {
-            socket.on('pos', function (data) {
-                p.x = data.cursolX;
-            });
-        }else if(this.getPlayerNum() == 1) {
-            socket.on('pos', function (data) {
-                p.x = 1.0 - data.cursolX;
-            });
-        }else{
-            return false;
-        }
-
+        socket.on('pos', function (data) {
+            console.log(data);
+        });
         p.setSocket(socket);
         p.setName(name);
         this.players.push(p);
 
-        if( this.players.length == 2 ) {
-            this.start();
-        };
-        
-        return true;
+        if(this.isWaitingGame()){
+            this.setup();
+        }else{
+            this.setupGame();
+            this.startGame();
+        }
+    },
+
+    setupGame: function() {
+        var data ={};
+        this.sendData2AllPlayers('setup', data);
     },
     
-    start: function() {
-        var iv = 0.01;
-        var t = Math.random() * Math.PI * 2.0;
-        this.ball.vx = iv * Math.cos(t);
-        this.ball.vy = iv * Math.sin(t);
+    startGame: function() {
+        var data ={};
+        this.sendData2AllPlayers('start_game', data);
+    },
+
+    endGame: function() {
+        var data ={};
+        this.sendData2AllPlayers('end_game', data);
+    },
+
+    play: function() {
         var self = this;
-        setInterval(function(){
+        this.updateTimer = setInterval(function(){
             self.update();
         }, 30);
     },
 
+    pause: function() {
+        clearInterval(this.updateTimer);
+        var data = {};
+        this.sendData2AllPlayers('pause', data);
+        //ゲーム終了？
+        if( false ) {
+            this.endGame();
+        }else{
+            this.play();
+        }
+    },
+
     update: function() {
-        var play0_data={
-            ballX:this.ball.x,
-            ballY:this.ball.y,
-            myX:this.players[0].x,
-            otherX:1.0-this.players[1].x
-        };
-        this.players[0].socket.emit('update', play0_data);
-        var play1_data={
-            ballX:this.ball.x,
-            ballY:1.0-this.ball.y,
-            myX:1.0-this.players[1].x,
-            otherX:this.players[0].x
-        };
-        this.players[1].socket.emit('update', play1_data);
-        this.ball.x += this.ball.vx;
-        this.ball.y += this.ball.vy;
-        if(this.ball.x < 0) {
-            this.ball.x = 0;
-            this.ball.vx *= -1;
-        }else if(this.ball.x > 1.0) {
-            this.ball.x = 1.0;
-            this.ball.vx *= -1;
-        }
-        if(this.ball.y < 0) {
-            this.ball.y = 0;
-            this.ball.vy *= -1;
-        }else if(this.ball.y > 1.0) {
-            this.ball.y = 1.0;
-            this.ball.vy *= -1;
-        }
-
-        //playrer between ball
-        var playerWall = function(ball,player,playerY,dx,dy){
-            return (playerY-dy<ball.y&&ball.y<playerY+dy&&player.x-dx<ball.x&&ball.x<player.x+dx);
-        };
-
-        if(playerWall(this.ball,this.players[0],0.9,0.1,0.05)) {
-            this.ball.vy *= -1;
-        }
-
-        if(playerWall(this.ball,this.players[1],0.1,0.1,0.05)) {
-            this.ball.vy *= -1;
-        }
-
+        //update logic of games
+        var data ={};
+        this.sendData2AllPlayers('update', data);
     },
 
     getPlayerNum : function() {
         return this.players.length;
-    }  
+    },
+
+    sendData2AllPlayers : function(msgName, data) {
+        for(var i=0; i<this.getPlayerNum(); i++) {
+            this.players[i].socket.emit(msgName, data);
+        }
+    },
+
+    isWaitingGame: function() {
+        if( this.getPlayerNum() != MaxPlayers ){
+            return false;
+        }else{
+            return true;
+        }
+    }
 };
+
 
 var Player = function() {
     this.name = "anonimous";
