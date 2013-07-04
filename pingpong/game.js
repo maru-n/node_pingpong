@@ -84,8 +84,8 @@ Game.prototype = {
 
         //playrer between ball
         var playerWall = function(ball,player,playerY,dx,dy){
-            return (playerY-dy<ball.y&&ball.y<playerY+dy&&player.x-dx<ball.x&&ball.x<player.x+dx)
-        }
+            return (playerY-dy<ball.y&&ball.y<playerY+dy&&player.x-dx<ball.x&&ball.x<player.x+dx);
+        };
 
         if(playerWall(this.ball,this.players[0],0.9,0.1,0.05)) {
             this.ball.vy *= -1;
@@ -125,4 +125,5 @@ function test() {
 
 
 //test();
+
 
