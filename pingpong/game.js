@@ -27,10 +27,8 @@ Game.prototype = {
         p.setName(name);
         this.players.push(p);
 
-        if(this.isWaitingGame()){
-            this.setup();
-        }else{
-            this.setupGame();
+        this.setupGame();
+        if(!this.isWaitingGame()){
             this.startGame();
         }
     },
