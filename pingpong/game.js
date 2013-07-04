@@ -55,14 +55,14 @@ Game.prototype = {
             ballX:this.ball.x,
             ballY:this.ball.y,
             myX:this.players[0].x,
-            otherX:this.players[1].x
+            otherX:1.0-this.players[1].x
         };
         this.players[0].socket.emit('update', play0_data);
         var play1_data={
             ballX:this.ball.x,
             ballY:1.0-this.ball.y,
             myX:1.0-this.players[1].x,
-            otherX:1.0-this.players[0].x
+            otherX:this.players[0].x
         };
         this.players[1].socket.emit('update', play1_data);
         this.ball.x += this.ball.vx;
@@ -83,12 +83,15 @@ Game.prototype = {
         }
 
         //playrer between ball
-        var y1=0.9,y2=0.1;
-        if(y1-0.05<this.ball.y&&this.ball.y<y1+0.05&&this.players[0].x-0.1<this.ball.x&&this.ball.x<this.players[0].x+0.1) {
+        var playerWall = function(ball,player,playerY,dx,dy){
+            return (playerY-dy<ball.y&&ball.y<playerY+dy&&player.x-dx<ball.x&&ball.x<player.x+dx)
+        }
+
+        if(playerWall(this.ball,this.players[0],0.9,0.1,0.05)) {
             this.ball.vy *= -1;
         }
 
-        if(y2-0.05<this.ball.y&&this.ball.y<y2+0.05&&(1.0-this.players[1].x)-0.1<this.ball.x&&this.ball.x<(1.0-this.players[1].x)+0.1) {
+        if(playerWall(this.ball,this.players[1],0.1,0.1,0.05)) {
             this.ball.vy *= -1;
         }
 
@@ -96,7 +99,7 @@ Game.prototype = {
 
     getPlayerNum : function() {
         return this.players.length;
-    }
+    }  
 };
 
 var Player = function() {
