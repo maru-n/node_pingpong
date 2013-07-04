@@ -60,7 +60,7 @@ Game.prototype = {
         this.players[0].socket.emit('update', play0_data);
         var play1_data={
             ballX:this.ball.x,
-            ballY:this.ball.y,
+            ballY:1.0-this.ball.y,
             myX:1.0-this.players[1].x,
             otherX:1.0-this.players[0].x
         };
@@ -81,6 +81,17 @@ Game.prototype = {
             this.ball.y = 1.0;
             this.ball.vy *= -1;
         }
+
+        //playrer between ball
+        var y1=0.9,y2=0.1;
+        if(y1-0.05<this.ball.y&&this.ball.y<y1+0.05&&this.players[0].x-0.1<this.ball.x&&this.ball.x<this.players[0].x+0.1) {
+            this.ball.vy *= -1;
+        }
+
+        if(y2-0.05<this.ball.y&&this.ball.y<y2+0.05&&(1.0-this.players[1].x)-0.1<this.ball.x&&this.ball.x<(1.0-this.players[1].x)+0.1) {
+            this.ball.vy *= -1;
+        }
+
     },
 
     getPlayerNum : function() {
