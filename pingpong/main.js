@@ -30,19 +30,8 @@ function init(){
 
     layer.add(fieldCircle);
 
-    var cursols = new Array();
-    /*
-    var myCursol = new Kinetic.Rect({
-        x: 300,
-        y: field.getHeight() - CURSOL_HEIGHT - 50,
-        width: CURSOL_WIDTH,
-        height: CURSOL_HEIGHT,
-        fill: 'green',
-        stroke: 'black',
-        strokeWidth: 2
-    });
-    layer.add(myCursol);
-     */
+
+
     /*
     var ball = new Kinetic.Circle({
         x: stage.getWidth() / 2,
@@ -57,35 +46,40 @@ function init(){
 
     // add the shape to the layer
     stage.add(layer);
-    
-    //for debug
-    var consoleLogHandler = function(data) {
-        console.log(data);
-    };
 
+    var cursols = new Array();    
     var setupHandler = function(data) {
+        console.log("setup");
         console.log(data);
         for( var i=0; i<data.playerData.length; i++) {
-            var p = data.playerData[i];
-            var c = new Kinetic.Rect({
-                angle: p.angle,
-                x: FIELD_CENTER_X + FIELD_RADIUS * Math.cos(p.angle),
-                y: FIELD_CENTER_Y + FIELD_RADIUS * Math.sin(p.angle),
-                width: p.width * FIELD_RADIUS,
-                height: 5,
-                fill: p.color,
-                stroke: 'black',
-                strokeWidth: 0.1,
-                offset: [p.width * FIELD_RADIUS / 2.0, 5. / 2.]
-            });
-            c.rotate(p.angle+Math.PI/2.0);
-            layer.add(c);
+            if( !cursols[i] ) {
+                var p = data.playerData[i];
+                var c = new Kinetic.Rect({
+                    angle: p.angle,
+                    x: FIELD_CENTER_X + FIELD_RADIUS * Math.cos(p.angle),
+                    y: FIELD_CENTER_Y + FIELD_RADIUS * Math.sin(p.angle),
+                    width: p.width * FIELD_RADIUS,
+                    height: 5,
+                    fill: p.color,
+                    stroke: 'black',
+                    strokeWidth: 0.1,
+                    offset: [p.width * FIELD_RADIUS / 2.0, 5. / 2.]
+                });
+                c.rotate(p.angle+Math.PI/2.0);
+                layer.add(c);
+                cursols[i] = c;
+            }
         }
         layer.draw();
     };
 
+    var startHandler = function(data) {
+        console.log("start");
+        console.log(data);
+    };
+
     socket.on('setup', setupHandler);
-    socket.on('start', consoleLogHandler);
+    socket.on('start', startHandler);
 
     //切断されたときのハンドラ
     socket.on('disconnect', function(message){
@@ -150,6 +144,7 @@ function init(){
 $(document).ready(function(){
     init();
 });
+
 
 
 
