@@ -65,7 +65,7 @@ function init(){
                     strokeWidth: 0.1,
                     offset: [p.width * FIELD_RADIUS / 2.0, 5. / 2.]
                 });
-                c.rotate(p.angle+Math.PI/2.0);
+                c.setRotation(p.angle+Math.PI/2.0);
                 layer.add(c);
                 cursols[i] = c;
             }
@@ -83,19 +83,6 @@ function init(){
         console.log("play");
         console.log(data);
         socket.on("update", updateHandler);
-        // キーボード操作
-        $(window).keydown(function(e) {
-            if (e.keyCode == 37) {
-                // left
-            }else if (e.keyCode == 39) {
-                //right
-            }
-        });
-        $(window).keyup(function(e) {
-            if (e.keyCode == 37) {
-            }else if (e.keyCode == 39) {
-            }
-        });
     };
 
     var updateHandler = function(data) {
@@ -105,13 +92,28 @@ function init(){
             var p = data.playerData[i];
             cursols[p.id].setPosition(FIELD_CENTER_X + FIELD_RADIUS * Math.cos(p.angle),
                                       FIELD_CENTER_Y + FIELD_RADIUS * Math.sin(p.angle));
-            cursols[p.id].rotate(p.angle+Math.PI/2.0);
-            }
+            cursols[p.id].setRotation(p.angle+Math.PI/2.0);
+        }
         layer.draw();
     };
 
     socket.on('setup', setupHandler);
     socket.on('start', startHandler);
+
+    // キーボード操作
+    $(window).keydown(function(e) {
+        if (e.keyCode == 37 || //left
+            e.keyCode == 39)  // right
+        {
+                socket.emit("action", {"pressedKey": e.keyCode});
+        }
+    });
+    $(window).keyup(function(e) {
+        if (e.keyCode == 37) {
+        }else if (e.keyCode == 39) {
+        }
+    });
+    
 
     //切断されたときのハンドラ
     socket.on('disconnect', function(message){

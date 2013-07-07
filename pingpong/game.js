@@ -6,6 +6,7 @@ exports.getNewGame = function() {
 
 
 const MAX_PLAYER_NUM = 2;
+const DELTA_THETA = 0.1;
 
 var Game = function() {
     this.id = Math.floor(Math.random() * 1000);
@@ -16,8 +17,21 @@ var Game = function() {
 Game.prototype = {
     addPlayer : function(socket, name) {
         var p = new Player(this.players.length);
-        socket.on('pos', function (data) {
-            console.log(data);
+        socket.on('action', function (data) {
+            if( data.pressedKey == 37 ) {
+                //left
+                p.angle += DELTA_THETA;
+                if( p.angle > Math.PI * 2.0 ) {
+                    p.angle -= Math.PI * 2.0;
+                }
+            }else if( data.pressedKey == 39 ) {
+                //right
+                p.angle -= DELTA_THETA;
+                if( p.angle < 0.0 ) {
+                    p.angle += Math.PI * 2.0;
+                }
+            }
+
         });
         p.setSocket(socket);
         p.setName(name);
