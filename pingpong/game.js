@@ -55,11 +55,10 @@ Game.prototype = {
         var data = {
             "gameData": this.getJson(),
             "fieldData": this.field.getJson(),
-            "playerData": this.getPlayerDataArray(),
             "playerData": this.getPlayerDataArray()
         };
         this.sendData2AllPlayers('play', data);
-        //this.startUpdate();
+        this.startUpdate();
     },
 
     pause: function() {
@@ -90,7 +89,10 @@ Game.prototype = {
     update: function() {
         //TODO:
         //update logic of games
-        var data ={};
+        var data ={
+            "fieldData": this.field.getJson(),
+            "playerData": this.getPlayerDataArray()
+        };
         this.sendData2AllPlayers('update', data);
     },
 
@@ -214,6 +216,7 @@ function test() {
 
 
 //test();
+
 
 
 
