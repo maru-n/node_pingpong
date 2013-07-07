@@ -2,31 +2,36 @@ var socket = io.connect('http://'+location.hostname, {
     'reconnect': false
 });
 
+
+
 function init(){
     
     const STAGE_WIDTH = 640;
     const STAGE_HEIGHT = 640;
 
-    const CURSOL_WIDTH = 100;
-    const CURSOL_HEIGHT = 30;
-    
     var stage = new Kinetic.Stage({
         container: 'container',
         width: window.innerWidth,
         height: window.innerHeight
     });
-    
     var layer = new Kinetic.Layer();
 
-    var field = new Kinetic.Rect({
-        x: 0,
-        y: 0,
-        width: stage.getWidth(),
-        height: stage.getHeight(),
-        fill: 'grey'
+    const FIELD_CENTER_X = stage.getWidth() / 2;
+    const FIELD_CENTER_Y = stage.getHeight() / 2;
+    const FIELD_RADIUS = 0.9 * ( stage.getWidth()>stage.getHeight()?stage.getHeight():stage.getWidth() ) / 2;
+
+    var fieldCircle = new Kinetic.Circle({
+        x: FIELD_CENTER_X,
+        y: FIELD_CENTER_Y,
+        radius: FIELD_RADIUS,
+        stroke: 'black',
+        strokeWidth: 0.1
     });
-    layer.add(field);
-    
+
+    layer.add(fieldCircle);
+
+    var cursols = new Array();
+    /*
     var myCursol = new Kinetic.Rect({
         x: 300,
         y: field.getHeight() - CURSOL_HEIGHT - 50,
@@ -37,56 +42,62 @@ function init(){
         strokeWidth: 2
     });
     layer.add(myCursol);
-
-    var otherCursol =  new Kinetic.Rect({
-        x: 300,
-        y: 50,
-        width: CURSOL_WIDTH,
-        height: CURSOL_HEIGHT,
-        fill: 'red',
-        stroke: 'black',
-        strokeWidth: 2
-    });
-    layer.add(otherCursol);
-
+     */
+    /*
     var ball = new Kinetic.Circle({
         x: stage.getWidth() / 2,
         y: stage.getHeight() / 2,
         radius: 10,
         fill: 'red',
         stroke: 'black',
-        strokeWidth: 2
-      });
+        strokeWidth: 1
+    });
+    layer.add(ball);
+     */
 
     // add the shape to the layer
-    layer.add(ball);
     stage.add(layer);
     
-    //socket.send()で送信されたメッセージは'message'のハンドラで取得できる。
-    socket.on('update', function (data) {
-        // ball
-        var absBallPosX = data.ballX;
-        var absBallPosY = data.ballY;
-        var ballX = absBallPosX * field.getWidth() - ball.getRadius()/2;
-        var ballY = absBallPosY * field.getHeight() - ball.getRadius()/2;
-        ball.setPosition(ballX, ballY);
+    //for debug
+    var consoleLogHandler = function(data) {
+        console.log(data);
+    };
 
-        // other position
-        var absOtherPosX = data.otherX;
-        var otherX = absOtherPosX * field.getWidth() - otherCursol.getWidth()/2;
-        otherCursol.setPosition(otherX, otherCursol.getPosition().y);
+    var setupHandler = function(data) {
+        console.log(data);
+        for( var i=0; i<data.playerData.length; i++) {
+            var p = data.playerData[i];
+            var c = new Kinetic.Rect({
+                angle: p.angle,
+                x: FIELD_CENTER_X + FIELD_RADIUS * Math.cos(p.angle),
+                y: FIELD_CENTER_Y + FIELD_RADIUS * Math.sin(p.angle),
+                width: p.width * FIELD_RADIUS,
+                height: 5,
+                fill: p.color,
+                stroke: 'black',
+                strokeWidth: 0.1,
+                offset: [p.width * FIELD_RADIUS / 2.0, 5. / 2.]
+            });
+            c.rotate(p.angle+Math.PI/2.0);
+            layer.add(c);
+        }
         layer.draw();
-    });
+    };
+
+    socket.on('setup', setupHandler);
+    socket.on('start', consoleLogHandler);
 
     //切断されたときのハンドラ
     socket.on('disconnect', function(message){
-      $("#message-area").append('切断されました');
+        console.log(message);
+        console.log("disconnected");
     });
 
     // キーボード操作
     var rightKeyPressed = false;
     var leftKeyPressed = false;
     $(window).keydown(function(e) {
+        /*
         var dx = 1;        
         var moveFunc = function(dx) {
             var pos = myCursol.getPosition();
@@ -125,6 +136,7 @@ function init(){
             }, 0);
         }
         return;
+         */
     });
     $(window).keyup(function(e) {
         if (e.keyCode == 37) {
@@ -138,6 +150,7 @@ function init(){
 $(document).ready(function(){
     init();
 });
+
 
 
 
