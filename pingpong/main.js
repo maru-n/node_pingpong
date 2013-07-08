@@ -69,6 +69,7 @@ function init(){
         console.log("start");
         console.log(data);
         socket.on("play", playHandler);
+        socket.on("pause", pauseHandler);
     };
 
     var playHandler =  function(data) {
@@ -80,6 +81,11 @@ function init(){
         layer.draw();
 
         socket.on("update", updateHandler);
+    };
+
+    var pauseHandler = function(data) {
+        console.log("pause");
+        console.log(data);
     };
 
     var updateHandler = function(data) {

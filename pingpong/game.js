@@ -73,6 +73,7 @@ Game.prototype = {
     },
 
     play: function() {
+        this.field.initPosition();
         var data = {
             "gameData": this.getJson(),
             "fieldData": this.field.getJson(),
@@ -83,10 +84,11 @@ Game.prototype = {
     },
 
     pause: function() {
-        //this.stopUpdate();
+        this.stopUpdate();
         var data = {};
         this.sendData2AllPlayers('pause', data);
-
+        
+        //ゲーム終了判定
         if( false ) {
             this.end();
         }else{
@@ -109,7 +111,7 @@ Game.prototype = {
     update: function() {
         this.field.update();
         if( this.field.isBallOut() ) {
-            this.field.initPosition();
+            this.pause();
         }
         var data ={
             "fieldData": this.field.getJson(),
