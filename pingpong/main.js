@@ -29,20 +29,12 @@ function init(){
     });
 
     layer.add(fieldCircle);
-
-
-
-    /*
     var ball = new Kinetic.Circle({
-        x: stage.getWidth() / 2,
-        y: stage.getHeight() / 2,
-        radius: 10,
+        radius: 5,
         fill: 'red',
         stroke: 'black',
-        strokeWidth: 1
+        strokeWidth: 0.1
     });
-    layer.add(ball);
-     */
 
     // add the shape to the layer
     stage.add(layer);
@@ -82,6 +74,11 @@ function init(){
     var playHandler =  function(data) {
         console.log("play");
         console.log(data);
+        ball.setPosition(FIELD_CENTER_X + FIELD_RADIUS * data.fieldData.ballX,
+                         FIELD_CENTER_Y + FIELD_RADIUS * data.fieldData.ballY);
+        layer.add(ball);
+        layer.draw();
+
         socket.on("update", updateHandler);
     };
 
@@ -94,6 +91,8 @@ function init(){
                                       FIELD_CENTER_Y + FIELD_RADIUS * Math.sin(p.angle));
             cursols[p.id].setRotation(p.angle+Math.PI/2.0);
         }
+        ball.setPosition(FIELD_CENTER_X + FIELD_RADIUS * data.fieldData.ballX,
+                         FIELD_CENTER_Y + FIELD_RADIUS * data.fieldData.ballY);
         layer.draw();
     };
 
