@@ -86,8 +86,8 @@ function init(){
     };
 
     var updateHandler = function(data) {
-        console.log("update");
-        console.log(data);
+        //console.log("update");
+        //console.log(data);
         for( var i=0; i<data.playerData.length; i++) {
             var p = data.playerData[i];
             cursols[p.id].setPosition(FIELD_CENTER_X + FIELD_RADIUS * Math.cos(p.angle),
@@ -102,15 +102,19 @@ function init(){
 
     // キーボード操作
     $(window).keydown(function(e) {
-        if (e.keyCode == 37 || //left
-            e.keyCode == 39)  // right
-        {
-                socket.emit("action", {"pressedKey": e.keyCode});
+        switch(e.keyCode){
+        case 37: //left
+        case 39: //right
+            socket.emit("action", {"keydown": e.keyCode});
+            break;
         }
     });
     $(window).keyup(function(e) {
-        if (e.keyCode == 37) {
-        }else if (e.keyCode == 39) {
+        switch(e.keyCode){
+        case 37: //left
+        case 39: //right
+            socket.emit("action", {"keyup": e.keyCode});
+            break;
         }
     });
     
@@ -125,6 +129,7 @@ function init(){
 $(document).ready(function(){
     init();
 });
+
 
 
 

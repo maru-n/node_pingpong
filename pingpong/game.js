@@ -5,8 +5,9 @@ exports.getNewGame = function() {
 };
 
 
-const MAX_PLAYER_NUM = 2;
-const DELTA_THETA = 0.1;
+const MAX_PLAYER_NUM = 3;
+const DELTA_THETA = 0.05;
+const UPDATE_INTERVAL_MSEC = 20;
 
 var Game = function() {
     this.id = Math.floor(Math.random() * 1000);
@@ -18,20 +19,26 @@ Game.prototype = {
     addPlayer : function(socket, name) {
         var p = new Player(this.players.length);
         socket.on('action', function (data) {
-            if( data.pressedKey == 37 ) {
-                //left
-                p.angle += DELTA_THETA;
-                if( p.angle > Math.PI * 2.0 ) {
-                    p.angle -= Math.PI * 2.0;
-                }
-            }else if( data.pressedKey == 39 ) {
-                //right
-                p.angle -= DELTA_THETA;
-                if( p.angle < 0.0 ) {
-                    p.angle += Math.PI * 2.0;
-                }
+            switch (data.keydown) {
+            case 37: //left
+                p.moving = "left";
+                break;
+            case 39: //right
+                p.moving = "right";
+                break;
             }
-
+            switch (data.keyup) {
+            case 37: //left
+                if( p.moving==="left" ) {
+                    p.moving = null;
+                }
+                break;
+            case 39: //right
+                if( p.moving==="right" ) {
+                    p.moving = null;
+                }
+                break;
+            }
         });
         p.setSocket(socket);
         p.setName(name);
@@ -92,7 +99,7 @@ Game.prototype = {
         var self = this;
         this.updateTimer = setInterval(function(){
             self.update();
-        }, 30);
+        }, UPDATE_INTERVAL_MSEC);
     },
 
     stopUpdate: function() {
@@ -101,15 +108,18 @@ Game.prototype = {
 
 
     update: function() {
-        //TODO:
-        //update logic of games
+        //action of players
+        for(var i=0; i<this.getPlayerNum(); i++) {
+            this.players[i].updatePosition();
+        }
+
         var data ={
             "fieldData": this.field.getJson(),
             "playerData": this.getPlayerDataArray()
         };
         this.sendData2AllPlayers('update', data);
     },
-
+    
     getPlayerNum : function() {
         return this.players.length;
     },
@@ -196,6 +206,7 @@ var Player = function(id) {
         ("0" + g.toString(16)).slice(-2) +
         ("0" + b.toString(16)).slice(-2);
     this.score = 0;
+    this.moving = null; //"left" or "right" or null
 };
 Player.prototype = {
     setSocket: function(socket) {
@@ -217,6 +228,19 @@ Player.prototype = {
             "score": this.score
         };
         return json;
+    },
+    updatePosition: function() {
+        if( this.moving === "left" ) {
+            this.angle += DELTA_THETA;
+            if( this.angle > Math.PI * 2.0 ) {
+                this.angle -= Math.PI * 2.0;
+            }
+        }else if( this.moving === "right" ) {
+            this.angle -= DELTA_THETA;
+            if( this.angle < 0.0 ) {
+                this.angle += Math.PI * 2.0;
+            }
+        }
     }
 };
 
@@ -230,6 +254,7 @@ function test() {
 
 
 //test();
+
 
 
 
