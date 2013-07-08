@@ -86,8 +86,7 @@ Game.prototype = {
         //this.stopUpdate();
         var data = {};
         this.sendData2AllPlayers('pause', data);
-        //TODO:
-        //ゲーム終了？
+
         if( false ) {
             this.end();
         }else{
