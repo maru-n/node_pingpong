@@ -25,8 +25,13 @@ Player.prototype = {
                 self.moving = "right";
                 break;
             }
-            if(data.keydown >= 48 && data.keydown <= 57) {
-                self.targetId = Number(data.keydown)-48;
+            if(data.keydown >= 48 && data.keydown <= 57 ) {
+                var keyNum = Number(data.keydown)-48;
+                if( keyNum != self.id ) {
+                    self.targetId = keyNum;
+                }else{
+                    self.targetId = 0;
+                }
             }
             switch (data.keyup) {
             case 37: //left

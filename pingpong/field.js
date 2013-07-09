@@ -2,8 +2,8 @@ const BALL_INITIAL_VEL = 0.01;
 const FIELD_RADIUS = 1.0;
 
 var Field = function() {
-    this.init();
     this.players = new Array();
+    this.init();
 };
 
 Field.prototype = {
@@ -17,11 +17,7 @@ Field.prototype = {
         this.ballVX = BALL_INITIAL_VEL * Math.cos(a);
         this.ballVY = BALL_INITIAL_VEL * Math.sin(a);
         this.ballOut = false;
-        var n = 0;
-        for( i in this.players ) {
-            n++;
-        }
-        this.ballTargetPlayerId = parseInt(Math.random() * n);
+        this.setTargetPlayerId(0);
     },
 
     getBallColor: function() {
@@ -29,6 +25,18 @@ Field.prototype = {
             return this.players[this.ballTargetPlayerId].color;
         }else{
             return "#000000";
+        }
+    },
+
+    setTargetPlayerId: function(i) {
+        if( i in this.players ) {
+            this.ballTargetPlayerId = i;
+        }else{
+            var n = 0;
+            for( i in this.players ) {
+                n++;
+            }
+            this.ballTargetPlayerId = parseInt(Math.random() * n)+1;
         }
     },
 
@@ -53,6 +61,7 @@ Field.prototype = {
                 if( pAng1 < ballAngle && pAng2 > ballAngle) {
                     this.ballVX *= -1;
                     this.ballVY *= -1;
+                    this.setTargetPlayerId( p.targetId );
                     this.ballOut = false;
                     break;
                 }
