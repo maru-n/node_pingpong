@@ -44,6 +44,29 @@ var Player = function(id, maxPlayerNum) {
 Player.prototype = {
     setSocket: function(socket) {
         this.socket = socket;
+        var self = this;
+        this.socket.on('action', function (data) {
+            switch (data.keydown) {
+            case 37: //left
+                self.moving = "left";
+                break;
+            case 39: //right
+                self.moving = "right";
+                break;
+            }
+            switch (data.keyup) {
+            case 37: //left
+                if( self.moving==="left" ) {
+                    self.moving = null;
+                }
+                break;
+            case 39: //right
+                if( self.moving==="right" ) {
+                    self.moving = null;
+                }
+                break;
+            }
+        });
     },
     setName: function(name) {
         this.name = name;

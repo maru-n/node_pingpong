@@ -14,33 +14,13 @@ var Game = function() {
     this.id = Math.floor(Math.random() * 1000);
     this.players = new Array();
     this.field = new Field();
+    //"setup", "play", "pause", "end"
+    this.gamePhase = "setup";
 };
 
 Game.prototype = {
     addPlayer : function(socket, name) {
         var p = new Player(this.players.length, MAX_PLAYER_NUM);
-        socket.on('action', function (data) {
-            switch (data.keydown) {
-            case 37: //left
-                p.moving = "left";
-                break;
-            case 39: //right
-                p.moving = "right";
-                break;
-            }
-            switch (data.keyup) {
-            case 37: //left
-                if( p.moving==="left" ) {
-                    p.moving = null;
-                }
-                break;
-            case 39: //right
-                if( p.moving==="right" ) {
-                    p.moving = null;
-                }
-                break;
-            }
-        });
         p.setSocket(socket);
         p.setName(name);
         this.players.push(p);
@@ -69,11 +49,13 @@ Game.prototype = {
     },
 
     end: function() {
+        this.gamePhase = "end";
         var data ={};
         this.sendData2AllPlayers('end', data);
     },
 
     play: function() {
+        this.gamePhase = "play";
         this.field.initPosition();
         var data = {
             "gameData": this.getJson(),
@@ -86,6 +68,7 @@ Game.prototype = {
 
     pause: function() {
         this.stopUpdate();
+        this.gamePhase = "pause";
         var data = {};
         this.sendData2AllPlayers('pause', data);
         
@@ -107,7 +90,6 @@ Game.prototype = {
     stopUpdate: function() {
         clearInterval(this.updateTimer);
     },
-
 
     update: function() {
         this.field.update();
