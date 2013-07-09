@@ -2,7 +2,7 @@ const BALL_INITIAL_VEL = 0.01;
 const FIELD_RADIUS = 1.0;
 
 var Field = function() {
-    this.initPosition();
+    this.init();
     this.players = new Array();
 };
 
@@ -10,17 +10,28 @@ Field.prototype = {
     setPlayers: function(p) {
         this.players[p.id] = p;
     },
-    initPosition: function() {
+    init: function() {
         this.ballX = 0.0;
         this.ballY = 0.0;
         var a = Math.random() * Math.PI * 2.0;
         this.ballVX = BALL_INITIAL_VEL * Math.cos(a);
         this.ballVY = BALL_INITIAL_VEL * Math.sin(a);
         this.ballOut = false;
-        //this.ballTargetPlayerId = Math.random() * ;
+        var n = 0;
+        for( i in this.players ) {
+            n++;
+        }
+        this.ballTargetPlayerId = parseInt(Math.random() * n);
     },
+
     getBallColor: function() {
+        if( this.players[this.ballTargetPlayerId] ) {
+            return this.players[this.ballTargetPlayerId].color;
+        }else{
+            return "#000000";
+        }
     },
+
     update: function() {
         for( var i in this.players ) {
             this.players[i].updatePosition();
@@ -33,6 +44,7 @@ Field.prototype = {
         //refrection
         if(  Math.sqrt(Math.pow(this.ballX,2) + Math.pow(this.ballY,2)) >= FIELD_RADIUS ) {
             var ballAngle = Math.atan2(this.ballY, this.ballX);
+            this.ballOut = true;
             for( i in this.players ) {
                 var p = this.players[i];
                 var pAng = (p.angle >= Math.PI) ? p.angle-Math.PI*2.0 : p.angle;
@@ -41,14 +53,13 @@ Field.prototype = {
                 if( pAng1 < ballAngle && pAng2 > ballAngle) {
                     this.ballVX *= -1;
                     this.ballVY *= -1;
+                    this.ballOut = false;
                     break;
-                }
-                if( i == this.players.length-1 ) {
-                    this.ballOut = true;
                 }
             }
         }
     },
+
     isBallOut: function() {
         return this.ballOut;
     },
@@ -56,7 +67,8 @@ Field.prototype = {
     getJson: function() {
         var json = {
             "ballX": this.ballX,
-            "ballY": this.ballY
+            "ballY": this.ballY,
+            "ballColor": this.getBallColor()
         };
         return json;
     }

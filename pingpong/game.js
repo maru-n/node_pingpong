@@ -60,7 +60,7 @@ Game.prototype = {
 
     play: function() {
         this.gamePhase = "play";
-        this.field.initPosition();
+        this.field.init();
         var data = {
             "gameData": this.getJson(),
             "fieldData": this.field.getJson(),

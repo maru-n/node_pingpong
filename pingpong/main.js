@@ -26,7 +26,6 @@ function init(){
     layer.add(fieldCircle);
     var ball = new Kinetic.Circle({
         radius: 5,
-        fill: 'red',
         stroke: 'black',
         strokeWidth: 0.1
     });
@@ -42,19 +41,16 @@ function init(){
         console.log(data);
         for( var i in data.playerData ) {
             if( !cursols[data.playerData[i].id] ) {
-                var p = data.playerData[i];
+                var pd = data.playerData[i];
                 var c = new Kinetic.Rect({
-                    angle: p.angle,
-                    x: FIELD_CENTER_X + FIELD_RADIUS * Math.cos(p.angle),
-                    y: FIELD_CENTER_Y + FIELD_RADIUS * Math.sin(p.angle),
-                    width: p.width * FIELD_RADIUS,
+                    width: pd.width * FIELD_RADIUS,
                     height: 5,
-                    fill: p.color,
+                    fill: pd.color,
                     stroke: 'black',
                     strokeWidth: 0.1,
-                    offset: [p.width * FIELD_RADIUS / 2.0, 5. / 2.]
+                    offset: [pd.width * FIELD_RADIUS / 2.0, 5. / 2.]
                 });
-                c.setRotation(p.angle+Math.PI/2.0);
+                updateCursol(c, pd); 
                 layer.add(c);
                 cursols[data.playerData[i].id] = c;
             }
@@ -72,8 +68,7 @@ function init(){
     var playHandler =  function(data) {
         console.log("play");
         console.log(data);
-        ball.setPosition(FIELD_CENTER_X + FIELD_RADIUS * data.fieldData.ballX,
-                         FIELD_CENTER_Y + FIELD_RADIUS * data.fieldData.ballY);
+        updateBall(ball, data.fieldData);
         layer.add(ball);
         layer.draw();
 
@@ -89,13 +84,10 @@ function init(){
         //console.log("update");
         //console.log(data);
         for(var i in data.playerData) {
-            var p = data.playerData[i];
-            cursols[p.id].setPosition(FIELD_CENTER_X + FIELD_RADIUS * Math.cos(p.angle),
-                                      FIELD_CENTER_Y + FIELD_RADIUS * Math.sin(p.angle));
-            cursols[p.id].setRotation(p.angle+Math.PI/2.0);
+            var pd = data.playerData[i];
+            updateCursol(cursols[pd.id], pd);
         }
-        ball.setPosition(FIELD_CENTER_X + FIELD_RADIUS * data.fieldData.ballX,
-                         FIELD_CENTER_Y + FIELD_RADIUS * data.fieldData.ballY);
+        updateBall(ball, data.fieldData);
         layer.draw();
     };
 
@@ -122,12 +114,23 @@ function init(){
         }
     });
     
-
     //切断されたときのハンドラ
     socket.on('disconnect', function(message){
         console.log("disconnected");
         console.log(message);
     });
+
+    //utils
+    function updateBall(ball, fieldData) {
+        ball.setPosition(FIELD_CENTER_X + FIELD_RADIUS * fieldData.ballX,
+                         FIELD_CENTER_Y + FIELD_RADIUS * fieldData.ballY);
+        ball.setFill(fieldData.ballColor);
+    }
+    function updateCursol(cursol, playerData) {
+        cursol.setPosition(FIELD_CENTER_X + FIELD_RADIUS * Math.cos(playerData.angle),
+                           FIELD_CENTER_Y + FIELD_RADIUS * Math.sin(playerData.angle));
+        cursol.setRotation(playerData.angle+Math.PI/2.0);
+    }
 }
 
 $(document).ready(function(){
