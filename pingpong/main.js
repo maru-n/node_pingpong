@@ -38,13 +38,14 @@ function init(){
 
     // add the shape to the layer
     stage.add(layer);
-
+    
+    // cursols[id]にそのIDのplayerの操作するカーソルが入る
     var cursols = new Array();    
     var setupHandler = function(data) {
         console.log("setup");
         console.log(data);
         for( var i=0; i<data.playerData.length; i++) {
-            if( !cursols[i] ) {
+            if( !cursols[data.playerData[i].id] ) {
                 var p = data.playerData[i];
                 var c = new Kinetic.Rect({
                     angle: p.angle,
@@ -59,9 +60,10 @@ function init(){
                 });
                 c.setRotation(p.angle+Math.PI/2.0);
                 layer.add(c);
-                cursols[i] = c;
+                cursols[data.playerData[i].id] = c;
             }
         }
+        console.log(cursols);
         layer.draw();
     };
 
@@ -118,6 +120,8 @@ function init(){
         switch(e.keyCode){
         case 37: //left
         case 39: //right
+        case 48: case 49: case 50: case 51: case 52:
+        case 53: case 54: case 55: case 56: case 57: //0~9 
             socket.emit("action", {"keyup": e.keyCode});
             break;
         }
@@ -134,6 +138,7 @@ function init(){
 $(document).ready(function(){
     init();
 });
+
 
 
 

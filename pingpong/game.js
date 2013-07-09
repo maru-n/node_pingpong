@@ -20,9 +20,11 @@ var Game = function() {
 
 Game.prototype = {
     addPlayer : function(socket, name) {
-        var p = new Player(this.players.length, MAX_PLAYER_NUM);
+        var p = new Player(this.players.length+1);
         p.setSocket(socket);
         p.setName(name);
+        p.setAngle( (this.players.length * 2.0*Math.PI / MAX_PLAYER_NUM) + Math.PI/2.0);
+        p.setNewColor(this.players.length, MAX_PLAYER_NUM);
         this.players.push(p);
         this.field.setPlayers(p);
         this.setup();
