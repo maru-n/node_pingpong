@@ -2,13 +2,8 @@ var socket = io.connect('http://'+location.hostname, {
     'reconnect': false
 });
 
-
-
 function init(){
     
-    const STAGE_WIDTH = 640;
-    const STAGE_HEIGHT = 640;
-
     var stage = new Kinetic.Stage({
         container: 'container',
         width: window.innerWidth,
@@ -40,11 +35,12 @@ function init(){
     stage.add(layer);
     
     // cursols[id]にそのIDのplayerの操作するカーソルが入る
-    var cursols = new Array();    
+    //var cursols = new Array();    
+    var cursols = {};
     var setupHandler = function(data) {
         console.log("setup");
         console.log(data);
-        for( var i=0; i<data.playerData.length; i++) {
+        for( var i in data.playerData ) {
             if( !cursols[data.playerData[i].id] ) {
                 var p = data.playerData[i];
                 var c = new Kinetic.Rect({
@@ -63,7 +59,6 @@ function init(){
                 cursols[data.playerData[i].id] = c;
             }
         }
-        console.log(cursols);
         layer.draw();
     };
 
@@ -93,7 +88,7 @@ function init(){
     var updateHandler = function(data) {
         //console.log("update");
         //console.log(data);
-        for( var i=0; i<data.playerData.length; i++) {
+        for(var i in data.playerData) {
             var p = data.playerData[i];
             cursols[p.id].setPosition(FIELD_CENTER_X + FIELD_RADIUS * Math.cos(p.angle),
                                       FIELD_CENTER_Y + FIELD_RADIUS * Math.sin(p.angle));
@@ -112,6 +107,8 @@ function init(){
         switch(e.keyCode){
         case 37: //left
         case 39: //right
+        case 48: case 49: case 50: case 51: case 52:
+        case 53: case 54: case 55: case 56: case 57: //0~9 
             socket.emit("action", {"keydown": e.keyCode});
             break;
         }
@@ -120,8 +117,6 @@ function init(){
         switch(e.keyCode){
         case 37: //left
         case 39: //right
-        case 48: case 49: case 50: case 51: case 52:
-        case 53: case 54: case 55: case 56: case 57: //0~9 
             socket.emit("action", {"keyup": e.keyCode});
             break;
         }

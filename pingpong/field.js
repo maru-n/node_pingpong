@@ -8,8 +8,7 @@ var Field = function() {
 
 Field.prototype = {
     setPlayers: function(p) {
-
-        this.players.push(p);
+        this.players[p.id] = p;
     },
     initPosition: function() {
         this.ballX = 0.0;
@@ -18,10 +17,12 @@ Field.prototype = {
         this.ballVX = BALL_INITIAL_VEL * Math.cos(a);
         this.ballVY = BALL_INITIAL_VEL * Math.sin(a);
         this.ballOut = false;
+        //this.ballTargetPlayerId = Math.random() * ;
+    },
+    getBallColor: function() {
     },
     update: function() {
-        //action of players
-        for(var i=0; i<this.players.length; i++) {
+        for( var i in this.players ) {
             this.players[i].updatePosition();
         }
 
@@ -32,7 +33,7 @@ Field.prototype = {
         //refrection
         if(  Math.sqrt(Math.pow(this.ballX,2) + Math.pow(this.ballY,2)) >= FIELD_RADIUS ) {
             var ballAngle = Math.atan2(this.ballY, this.ballX);
-            for(i=0; i<this.players.length; i++) {
+            for( i in this.players ) {
                 var p = this.players[i];
                 var pAng = (p.angle >= Math.PI) ? p.angle-Math.PI*2.0 : p.angle;
                 var pAng1 = pAng - p.width/2/FIELD_RADIUS;

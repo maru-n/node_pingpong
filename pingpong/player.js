@@ -26,8 +26,7 @@ Player.prototype = {
                 break;
             }
             if(data.keydown >= 48 && data.keydown <= 57) {
-                var keyNum = Number(data.keydown)-48;
-                console.log(keyNum);
+                self.targetId = Number(data.keydown)-48;
             }
             switch (data.keyup) {
             case 37: //left

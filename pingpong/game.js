@@ -12,6 +12,7 @@ const UPDATE_INTERVAL_MSEC = 20;
 
 var Game = function() {
     this.id = Math.floor(Math.random() * 1000);
+    //this.players = {};
     this.players = new Array();
     this.field = new Field();
     //"setup", "play", "pause", "end"
@@ -20,12 +21,13 @@ var Game = function() {
 
 Game.prototype = {
     addPlayer : function(socket, name) {
-        var p = new Player(this.players.length+1);
+        var id = this.getPlayerNum()+1;
+        var p = new Player(id);
         p.setSocket(socket);
         p.setName(name);
-        p.setAngle( (this.players.length * 2.0*Math.PI / MAX_PLAYER_NUM) + Math.PI/2.0);
-        p.setNewColor(this.players.length, MAX_PLAYER_NUM);
-        this.players.push(p);
+        p.setAngle( (id-1) * 2.0*Math.PI / MAX_PLAYER_NUM + Math.PI/2.0);
+        p.setNewColor( (id-1), MAX_PLAYER_NUM);
+        this.players[p.id] = p;
         this.field.setPlayers(p);
         this.setup();
         if(!this.isWaitingGame()){
@@ -34,7 +36,7 @@ Game.prototype = {
     },
 
     setup: function() {
-        for(var i=0; i<this.getPlayerNum(); i++) {
+        for( var i in this.players ) {
             var data = {
                 "gameData": this.getJson(),
                 "playerData": this.getPlayerDataArray(),
@@ -106,11 +108,15 @@ Game.prototype = {
     },
     
     getPlayerNum : function() {
-        return this.players.length;
+	    var cnt = 0;
+	    for(var k in this.players){ 
+            cnt++;
+        }
+	    return cnt;
     },
 
     sendData2AllPlayers : function(msgName, data) {
-        for(var i=0; i<this.getPlayerNum(); i++) {
+        for( var i in this.players ) {
             this.players[i].socket.emit(msgName, data);
         }
     },
@@ -131,10 +137,10 @@ Game.prototype = {
     },
 
     getPlayerDataArray: function() {
-        var playerData = new Array();
-        for(var i=0; i<this.getPlayerNum(); i++) {
-            playerData.push(this.players[i].getJson());
-        }
+        var playerData = {};
+        for(var i in this.players) {
+            playerData[i] = this.players[i].getJson();
+        };
         return playerData;
     }
 };
